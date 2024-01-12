@@ -1,13 +1,19 @@
 import './index.css';
 import { initialCards } from './cards';
-import {createCard, removeCard} from './components/card.js';
-import {newPlacePlus, handleFormSubmit} from './components/modal.js';
+import {createCard, removeCard , likeCard} from './components/card.js';
+import {openPopup, closePopup} from './components/modal.js';
 
 const cardsContainer = document.querySelector('.places__list');
 const cardTemplate = document.querySelector('#card-template').content;
 const editPopup = document.querySelector('.popup_type_edit');
 const plusPopup = document.querySelector('.popup_type_new-card');
-const buttonsProfile = document.querySelector('.profile');
+const buttonEdit = document.querySelector('.profile__edit-button');
+const buttonAddNewCard = document.querySelector('.profile__add-button');
+const profileTitle = document.querySelector('.profile__title');
+const profileJob = document.querySelector('.profile__description');
+const imgPopup = document.querySelector('.popup_type_image');
+const imgPopupImg = document.querySelector('.popup__image');
+const imgPopupParagraph = document.querySelector('.popup__caption');
 const closeButtons = document.querySelectorAll('.popup__close');
 const formElement = document.querySelector('.popup__form');
 const newPlaceForm = document.getElementsByName('new-place')[0];
@@ -16,29 +22,26 @@ const urlNewPlaceInput = newPlaceForm.querySelector('.popup__input_type_url');
 const nameInput = formElement.querySelector('.popup__input_type_name');
 const jobInput = formElement.querySelector('.popup__input_type_description');
 
-buttonsProfile.addEventListener('click', evt => {
-  if(evt.target.classList.value === 'profile__edit-button') {
-    nameInput.value = document.querySelector('.profile__title').textContent;
-    jobInput.value = document.querySelector('.profile__description').textContent;
-    openPopup(editPopup);
-  }
-  if(evt.target.classList.value === 'profile__add-button') {
-    openPopup(plusPopup);
-  }
-})
+buttonEdit.addEventListener('click', evt => {
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileJob.textContent;
+  openPopup(editPopup);
+});
+
+buttonAddNewCard.addEventListener('click', () => openPopup(plusPopup));
 
 closeButtons.forEach(item => {
   item.addEventListener('click', evt => {
-    closePopup(evt.target.parentElement.parentElement);
+    closePopup(evt.target.closest('.popup'));
   })
-})
+});
 
 function openImgPopup(evt) {
-  document.querySelector('.popup__image').src = evt.src;
-  document.querySelector('.popup__image').alt = evt.alt;
-  document.querySelector('.popup__caption').textContent = evt.alt;
-  openPopup(document.querySelector('.popup_type_image'))
-}
+  imgPopupImg.src = evt.src;
+  imgPopupImg.alt = evt.alt;
+  imgPopupParagraph.textContent = evt.alt;
+  openPopup(imgPopup);
+};
 
 document.querySelectorAll('.popup').forEach(item => {
   item.addEventListener('click', evt => {
@@ -48,30 +51,31 @@ document.querySelectorAll('.popup').forEach(item => {
   })
 })
 
-function openPopup(item) {
-  item.classList.add('popup_is-opened');
-  //item.classList.add('popup_is-animated');
-
-  document.addEventListener('keydown', evt => {
-    if(evt.key === 'Escape') {
-      closePopup(item);
-    }
-  })
-};
-
-function closePopup(item) {
-  item.classList.remove('popup_is-opened');
-  //item.classList.remove('popup_is-animated');
-
-  document.removeEventListener('keydown', evt => {});
-}
-
 initialCards.forEach((cardData) => {
-  const card = createCard(cardData, removeCard);
+  const card = createCard(cardData, removeCard, likeCard);
   cardsContainer.append(card);
 });
+
+function handleFormSubmit(evt) {
+  evt.preventDefault();
+  profileJob.textContent = jobInput.value;
+  profileTitle.textContent = nameInput.value;
+  closePopup(evt.target.closest('.popup'));
+};
+
+function newPlacePlus(evt) {
+  evt.preventDefault();
+  const card = createCard({
+    name: nameNewPlaceInput.value,
+    link: urlNewPlaceInput.value
+  }, removeCard, likeCard);
+  cardsContainer.prepend(card);
+  closePopup(evt.target.parentElement.parentElement)
+  nameNewPlaceInput.value = '';
+  urlNewPlaceInput.value = '';
+}
 
 formElement.addEventListener('submit', handleFormSubmit);
 newPlaceForm.addEventListener('submit', newPlacePlus);
 
-export {cardsContainer, cardTemplate, openImgPopup, closePopup, nameNewPlaceInput, urlNewPlaceInput, nameInput, jobInput};
+export {cardTemplate, openImgPopup};
