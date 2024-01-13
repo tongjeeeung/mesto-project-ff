@@ -1,19 +1,19 @@
 function openPopup(item) {
   item.classList.add('popup_is-opened');
 
-  document.addEventListener('keydown', (evt) => closeEsc(evt, item));
+  document.addEventListener('keydown', closeEsc);
 };
 
 function closePopup(item) {
   item.classList.remove('popup_is-opened');
 
-  document.removeEventListener('keydown', (evt) => closeEsc(evt, item));
+  document.removeEventListener('keydown', closeEsc);
 }
 
-function closeEsc(evt, item) {
+function closeEsc(evt) {
   if(evt.key === 'Escape') {
-    closePopup(item);
+    closePopup(document.querySelector('.popup_is-opened'));
   }
 };
 
-export {openPopup, closePopup, closeEsc}
+export {openPopup, closePopup}

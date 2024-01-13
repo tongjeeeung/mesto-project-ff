@@ -70,7 +70,7 @@ function newPlacePlus(evt) {
     link: urlNewPlaceInput.value
   }, removeCard, likeCard);
   cardsContainer.prepend(card);
-  closePopup(evt.target.parentElement.parentElement)
+  closePopup(plusPopup)
   nameNewPlaceInput.value = '';
   urlNewPlaceInput.value = '';
 }
