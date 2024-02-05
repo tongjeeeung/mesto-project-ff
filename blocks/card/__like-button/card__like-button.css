@@ -1,3 +1,15 @@
+.card__like {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card__like-counter {
+  font-size: 13px;
+  line-height: 16px;
+}
+
 .card__like-button {
   width: 21px;
   height: 18px;

@@ -1,6 +1,6 @@
 function openPopup(item) {
   item.classList.add('popup_is-opened');
-
+  
   document.addEventListener('keydown', closeEsc);
 };
 
