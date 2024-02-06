@@ -8,7 +8,7 @@ function enableValidation(validationConfig) {
 function setEventListenersForm(formElement, validationConfig) {
   const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
   const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
-  
+
   toggleButtonState(inputList, buttonElement, validationConfig);
   inputList.forEach(inputElement => {
     inputElement.addEventListener('input', function () {
@@ -60,17 +60,16 @@ function toggleButtonState(inputList, buttonElement, validationConfig) {
   }
 }
 
-function clearValidation(formElement, validationConfig) {
-  const inputList = formElement.querySelectorAll(validationConfig.inputSelector);
-  const spanList = formElement.querySelectorAll(`.${validationConfig.errorClass}`);
+function clearValidation(formElement, validationConfig, buttonElement) {
+  const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
+  const spanList = Array.from(formElement.querySelectorAll(`.${validationConfig.errorClass}`));
   inputList.forEach(inputElement => {
-    if(inputElement.classList.contains(validationConfig.inputErrorClass)) {
-      inputElement.classList.remove(validationConfig.inputErrorClass);
-    }
+    hideInputError(formElement, inputElement, validationConfig);
   })
   spanList.forEach(spanElement => {
     spanElement.textContent = '';
   })
+  toggleButtonState(inputList, buttonElement, validationConfig);
 }
 
 export { enableValidation, clearValidation };

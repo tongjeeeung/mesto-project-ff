@@ -36,31 +36,23 @@ const validationConfig = {
   errorClass: 'popup__error_visible'
 };
 
-getProfileInfo()
-  .then(res => res.json())
-  .then(res => {
-    profileTitle.textContent = res.name;
-    profileJob.textContent = res.about
-    profileImg.style.backgroundImage = `url('${res.avatar}')`;
-  })
-
 buttonEdit.addEventListener('click', evt => {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileJob.textContent;
-  clearValidation(editPopup.querySelector(validationConfig.formSelector), validationConfig)
+  clearValidation(editPopup.querySelector(validationConfig.formSelector), validationConfig, editPopup.querySelector(validationConfig.submitButtonSelector))
   openPopup(editPopup);
 });
 
 buttonAddNewCard.addEventListener('click', () => {
   nameNewPlaceInput.value = '';
   urlNewPlaceInput.value = '';
+  clearValidation(plusPopup.querySelector(validationConfig.formSelector), validationConfig, plusPopup.querySelector(validationConfig.submitButtonSelector));
   openPopup(plusPopup);
-  clearValidation(plusPopup.querySelector(validationConfig.formSelector), validationConfig);
 });
 
 profileImg.addEventListener('click', () => {
   urlAvatarInput.value = '';
-  clearValidation(avatarPopup.querySelector(validationConfig.formSelector), validationConfig);
+  clearValidation(avatarPopup.querySelector(validationConfig.formSelector), validationConfig, avatarPopup.querySelector(validationConfig.submitButtonSelector));
   openPopup(avatarPopup);
 })
 
@@ -79,7 +71,7 @@ function openImgPopup(evt) {
 };
 
 document.querySelectorAll('.popup').forEach(item => {
-  item.addEventListener('click', evt => {
+  item.addEventListener('mousedown', evt => {
     if(evt.target === item) {
       closePopup(evt.target);
     }
@@ -88,16 +80,21 @@ document.querySelectorAll('.popup').forEach(item => {
 
 function handleFormSubmit(evt) {
   evt.preventDefault();
-  profileJob.textContent = jobInput.value;
-  profileTitle.textContent = nameInput.value;
   renderLoading(true, formElement.querySelector('.button'));
+
   profileEditPatch({name: nameInput.value,
     about: jobInput.value})
+    .then(res => {
+      profileJob.textContent = res.about;
+      profileTitle.textContent = res.name;
+      closePopup(evt.target.closest('.popup'));
+    })
+    .catch((err) => {
+      console.log(err);
+    })
     .finally(() => {
       renderLoading(false, formElement.querySelector('.button'));
     })
-
-  closePopup(evt.target.closest('.popup'));
 };
 
 function newPlacePlus(evt) {
@@ -105,39 +102,50 @@ function newPlacePlus(evt) {
   renderLoading(true, newPlaceForm.querySelector('.button'));
   newPlacePost({name: nameNewPlaceInput.value,
     link: urlNewPlaceInput.value})
-    .then(res => res.json())
     .then(res => {
-      const card = createCard(res, removeCard, likeCard);
+      const card = createCard(res, removeCard, likeCard, res.owner, openImgPopup, cardTemplate);
       cardsContainer.prepend(card);
+      closePopup(plusPopup)
+      nameNewPlaceInput.value = '';
+      urlNewPlaceInput.value = '';
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       renderLoading(false, newPlaceForm.querySelector('.button'));
     })
-
-  closePopup(plusPopup)
-  nameNewPlaceInput.value = '';
-  urlNewPlaceInput.value = '';
 }
 
 function handleAvatarEdit(evt) {
   evt.preventDefault();
   renderLoading(true, avatarForm.querySelector('.button'));
   avatarPatch({avatar: urlAvatarInput.value})
+    .then(res => {
+      profileImg.style.backgroundImage = `url('${res.avatar}')`;
+      closePopup(avatarPopup);
+      urlAvatarInput.value = '';
+    })
+    .catch((err) => {
+      console.log(err);
+    })
     .finally(() => {
       renderLoading(false, avatarForm.querySelector('.button'));
     })
-
-  profileImg.style.backgroundImage = `url('${urlAvatarInput.value}')`;
-  closePopup(avatarPopup);
-  urlAvatarInput.value = '';
 }
 
 function renderLoading(isLoading, button) {
-  if(isLoading) {
+  if(button.textContent[2] == 'х' && isLoading) {
     button.textContent = 'Сохранение...';
   }
-  else {
+  else if(button.textContent[2] == 'х') {
     button.textContent = 'Сохранить';
+  }
+  else if(isLoading) {
+    button.textContent = 'Создание...';
+  }
+  else {
+    button.textContent = 'Создать';
   }
 }
 
@@ -147,13 +155,15 @@ avatarForm.addEventListener('submit', handleAvatarEdit);
 
 enableValidation(validationConfig);
 
-getCards()
-  .then(res => res.json())
-  .then((result) => {
-    result.forEach(cardElement => {
-      const card = createCard(cardElement, removeCard, likeCard);
+Promise.all([getProfileInfo(), getCards()])
+  .then(([info, initialCards]) => {
+    profileTitle.textContent = info.name;
+    profileJob.textContent = info.about
+    profileImg.style.backgroundImage = `url('${info.avatar}')`;
+
+    initialCards.forEach(cardElement => {
+      const card = createCard(cardElement, removeCard, likeCard, info, openImgPopup, cardTemplate);
       cardsContainer.append(card);
     });
-  });
-
-export {cardTemplate, openImgPopup};
+  })
+  .catch(err => {console.log(err)})
