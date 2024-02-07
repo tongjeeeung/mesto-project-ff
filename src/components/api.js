@@ -15,25 +15,25 @@ function likeCardFeach(cardId, methodStr) {
 }
 
 function cardDelete(cardId) {
-  fetch(`${config.baseUrl}/cards/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
     headers: config.headers
   })
-  .then(res => findError(res));
+  .then(res => findError(res))
 }
 
 function getProfileInfo() {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers
   })
-  .then(res => findError(res));
+  .then(res => findError(res))
 }
 
 function getCards() {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
-  .then(res => findError(res));
+  .then(res => findError(res))
 }
 
 function profileEditPatch(item) {
@@ -42,7 +42,7 @@ function profileEditPatch(item) {
     headers: config.headers,
     body: JSON.stringify(item)
   })
-  .then(res => findError(res));
+  .then(res => findError(res))
 }
 
 function findError(res) {
@@ -58,7 +58,7 @@ function newPlacePost(item) {
     headers: config.headers,
     body: JSON.stringify(item)
   })
-  .then(res => findError(res));
+  .then(res => findError(res))
 }
 
 function avatarPatch(item) {

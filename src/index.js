@@ -80,26 +80,28 @@ document.querySelectorAll('.popup').forEach(item => {
 
 function handleFormSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true, formElement.querySelector('.button'));
+  const originalButtonText = evt.submitter.textContent;
+  renderLoading(evt.submitter);
 
   profileEditPatch({name: nameInput.value,
     about: jobInput.value})
     .then(res => {
       profileJob.textContent = res.about;
       profileTitle.textContent = res.name;
-      closePopup(evt.target.closest('.popup'));
+      closePopup(editPopup);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      renderLoading(false, formElement.querySelector('.button'));
+      renderLoading(evt.submitter, originalButtonText);
     })
 };
 
 function newPlacePlus(evt) {
   evt.preventDefault();
-  renderLoading(true, newPlaceForm.querySelector('.button'));
+  const originalButtonText = evt.submitter.textContent;
+  renderLoading(evt.submitter);
   newPlacePost({name: nameNewPlaceInput.value,
     link: urlNewPlaceInput.value})
     .then(res => {
@@ -113,13 +115,14 @@ function newPlacePlus(evt) {
       console.log(err);
     })
     .finally(() => {
-      renderLoading(false, newPlaceForm.querySelector('.button'));
+      renderLoading(evt.submitter, originalButtonText);
     })
 }
 
 function handleAvatarEdit(evt) {
   evt.preventDefault();
-  renderLoading(true, avatarForm.querySelector('.button'));
+  const originalButtonText = evt.submitter.textContent;
+  renderLoading(evt.submitter);
   avatarPatch({avatar: urlAvatarInput.value})
     .then(res => {
       profileImg.style.backgroundImage = `url('${res.avatar}')`;
@@ -130,23 +133,12 @@ function handleAvatarEdit(evt) {
       console.log(err);
     })
     .finally(() => {
-      renderLoading(false, avatarForm.querySelector('.button'));
+      renderLoading(evt.submitter, originalButtonText);
     })
 }
 
-function renderLoading(isLoading, button) {
-  if(button.textContent[2] == 'х' && isLoading) {
-    button.textContent = 'Сохранение...';
-  }
-  else if(button.textContent[2] == 'х') {
-    button.textContent = 'Сохранить';
-  }
-  else if(isLoading) {
-    button.textContent = 'Создание...';
-  }
-  else {
-    button.textContent = 'Создать';
-  }
+function renderLoading(button, text = 'Сохранение...') {
+  button.textContent = text;
 }
 
 formElement.addEventListener('submit', handleFormSubmit);

@@ -28,8 +28,13 @@ function createCard(cardData, removeCard, likeCard, info, openImgPopup, cardTemp
 }
 
 function removeCard(card, cardId) {
-  cardDelete(cardId);
-  card.remove()
+  cardDelete(cardId)
+  .then(res => {
+    card.remove()
+  })
+  .catch((err) => {
+    console.log(err)
+  })
 }
 
 function likeCard(evt, cardData, likeCounter) {

@@ -62,12 +62,8 @@ function toggleButtonState(inputList, buttonElement, validationConfig) {
 
 function clearValidation(formElement, validationConfig, buttonElement) {
   const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
-  const spanList = Array.from(formElement.querySelectorAll(`.${validationConfig.errorClass}`));
   inputList.forEach(inputElement => {
     hideInputError(formElement, inputElement, validationConfig);
-  })
-  spanList.forEach(spanElement => {
-    spanElement.textContent = '';
   })
   toggleButtonState(inputList, buttonElement, validationConfig);
 }
